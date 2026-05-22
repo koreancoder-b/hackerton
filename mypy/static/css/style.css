@@ -1,0 +1,261 @@
+/* ── 전역 ───────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #0d0d1a;
+  --surface:  #13132a;
+  --surface2: #1c1c3a;
+  --border:   #2a2a4a;
+  --green:    #4ade80;
+  --orange:   #fb923c;
+  --red:      #f87171;
+  --blue:     #60a5fa;
+  --text:     #e2e8f0;
+  --muted:    #64748b;
+  --radius:   14px;
+  --shadow:   0 4px 24px rgba(0,0,0,.45);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 15px;
+  min-height: 100vh;
+}
+
+/* ── 헤더 ───────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  font-size: 1.35rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--green), var(--blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.version {
+  margin-left: 8px;
+  font-size: .7rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  vertical-align: middle;
+}
+
+/* ── 배지 ───────────────────────────────────────── */
+.badge {
+  padding: 4px 14px;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.badge-idle       { background: #1e293b; color: var(--muted); }
+.badge-connecting { background: #1e293b; color: var(--orange); }
+.badge-ready      { background: #14532d; color: var(--green); }
+.badge-running    { background: #14532d; color: var(--green); animation: pulse 1.5s infinite; }
+.badge-error      { background: #450a0a; color: var(--red); }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .55; }
+}
+
+/* ── 레이아웃 ───────────────────────────────────── */
+.app  { display: flex; flex-direction: column; min-height: 100vh; }
+.main { display: flex; gap: 20px; padding: 20px 28px; flex: 1; }
+
+.video-panel { flex: 1; display: flex; flex-direction: column; gap: 14px; }
+.sidebar     { width: 300px; display: flex; flex-direction: column; gap: 14px; }
+
+/* ── 영상 래퍼 ──────────────────────────────────── */
+.video-wrap {
+  position: relative;
+  background: #060612;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  /* aspect-ratio는 JS에서 실제 웹캠 비율로 동적 설정 */
+  aspect-ratio: 16/9;
+  width: 100%;
+}
+
+/* raw 웹캠 — 레이어 1 (가장 아래) */
+#webcam {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: none;
+}
+
+/* 처리된 프레임 — 레이어 2 (웹캠 위에 덮음) */
+#proc-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: none;
+  z-index: 1;
+}
+
+/* placeholder — 레이어 3 (최상단, 시작 전에만 보임) */
+.placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--muted);
+  z-index: 2;
+}
+.placeholder-icon { font-size: 3.5rem; }
+.placeholder p    { font-size: .95rem; }
+
+/* ── 제어 버튼 ──────────────────────────────────── */
+.controls { display: flex; gap: 12px; }
+
+.btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity .15s, transform .1s;
+}
+.btn:disabled { opacity: .35; cursor: not-allowed; }
+.btn:not(:disabled):hover  { opacity: .88; }
+.btn:not(:disabled):active { transform: scale(.97); }
+
+.btn-green { background: var(--green);  color: #000; }
+.btn-red   { background: var(--red);    color: #000; }
+
+/* ── 카드 ───────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+}
+.card-title {
+  font-size: .8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+
+/* ── 상태 카드 ──────────────────────────────────── */
+.status-card {
+  text-align: center;
+  transition: border-color .3s, background .3s;
+}
+.status-icon  { font-size: 2.8rem; margin-bottom: 8px; }
+.status-label {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  margin-bottom: 6px;
+}
+.status-sub { font-size: .8rem; color: var(--muted); }
+
+/* 상태별 스타일 */
+.status-studying { border-color: var(--green);  background: #052e16; }
+.status-sleeping { border-color: var(--orange); background: #431407; }
+.status-away     { border-color: var(--red);    background: #450a0a; }
+.status-phone    { border-color: var(--red);    background: #450a0a; }
+.status-idle     { border-color: var(--border); }
+
+/* ── 알림 배너 ──────────────────────────────────── */
+.alert-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #450a0a;
+  border: 1px solid var(--red);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  font-weight: 700;
+  font-size: .95rem;
+  color: var(--red);
+  animation: shake .3s ease;
+}
+.alert-icon { font-size: 1.3rem; }
+.hidden { display: none !important; }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25%       { transform: translateX(-6px); }
+  75%       { transform: translateX(6px); }
+}
+
+/* ── 통계 리스트 ────────────────────────────────── */
+.stat-list   { display: flex; flex-direction: column; gap: 10px; }
+.stat-row    { display: flex; justify-content: space-between; align-items: center; }
+.stat-name   { color: var(--muted); font-size: .88rem; }
+.stat-val    { font-weight: 700; font-size: .95rem; }
+.stat-val.green  { color: var(--green); }
+.stat-val.orange { color: var(--orange); }
+.stat-val.red    { color: var(--red); }
+
+/* ── 게이지 ─────────────────────────────────────── */
+.gauge-wrap  { display: flex; align-items: center; gap: 12px; }
+.gauge-bar   {
+  flex: 1;
+  height: 12px;
+  background: var(--surface2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.gauge-fill  {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green), var(--blue));
+  border-radius: 999px;
+  transition: width .5s ease;
+}
+.gauge-label { min-width: 36px; text-align: right; font-weight: 700; font-size: .9rem; }
+
+/* ── 토스트 ─────────────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 12px 24px;
+  border-radius: 999px;
+  font-size: .9rem;
+  box-shadow: var(--shadow);
+  z-index: 100;
+  animation: fadeIn .25s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ── 반응형 ─────────────────────────────────────── */
+@media (max-width: 900px) {
+  .main { flex-direction: column; }
+  .sidebar { width: 100%; }
+}

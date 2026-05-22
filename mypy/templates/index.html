@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FocusGuardian Web</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div class="app">
+
+    <!-- 헤더 -->
+    <header class="header">
+      <div class="header-left">
+        <span class="logo">FocusGuardian</span>
+        <span class="version">Web</span>
+      </div>
+      <div id="conn-badge" class="badge badge-idle">오프라인</div>
+    </header>
+
+    <!-- 본문 -->
+    <main class="main">
+
+      <!-- 영상 패널 -->
+      <section class="video-panel">
+        <div class="video-wrap">
+          <!-- 처음엔 숨겨진 웹캠 (캡처용) -->
+          <video id="webcam" autoplay playsinline muted></video>
+          <!-- 서버가 보내준 처리된 프레임 -->
+          <img id="proc-frame" alt="분석 화면" />
+          <div id="video-placeholder" class="placeholder">
+            <div class="placeholder-icon">📷</div>
+            <p>시작 버튼을 눌러 모니터링을 시작하세요</p>
+          </div>
+        </div>
+
+        <!-- 제어 버튼 -->
+        <div class="controls">
+          <button id="btn-start" class="btn btn-green">시작</button>
+          <button id="btn-stop"  class="btn btn-red"   disabled>중지</button>
+        </div>
+      </section>
+
+      <!-- 사이드바 -->
+      <aside class="sidebar">
+
+        <!-- 현재 상태 카드 -->
+        <div id="status-card" class="card status-card status-idle">
+          <div id="status-icon" class="status-icon">⏸</div>
+          <div id="status-label" class="status-label">대기 중</div>
+          <div id="status-sub" class="status-sub">모니터링이 시작되면 상태가 표시됩니다</div>
+        </div>
+
+        <!-- 알림 배너 -->
+        <div id="phone-alert" class="alert-banner hidden">
+          <span class="alert-icon">📵</span>
+          <span>휴대폰 사용 감지!</span>
+        </div>
+
+        <!-- 통계 카드 -->
+        <div class="card stats-card">
+          <div class="card-title">오늘의 학습 통계</div>
+          <div class="stat-list">
+            <div class="stat-row">
+              <span class="stat-name">학습 시간</span>
+              <span id="stat-study"  class="stat-val green">00:00:00</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-name">집중도</span>
+              <span id="stat-focus"  class="stat-val">-</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-name">졸음 횟수</span>
+              <span id="stat-sleep"  class="stat-val orange">0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-name">자리비움 횟수</span>
+              <span id="stat-away"   class="stat-val red">0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-name">폰 사용 횟수</span>
+              <span id="stat-phone"  class="stat-val red">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 집중도 게이지 -->
+        <div class="card">
+          <div class="card-title">집중도 게이지</div>
+          <div class="gauge-wrap">
+            <div class="gauge-bar">
+              <div id="gauge-fill" class="gauge-fill" style="width:0%"></div>
+            </div>
+            <span id="gauge-label" class="gauge-label">0%</span>
+          </div>
+        </div>
+
+      </aside>
+    </main>
+
+    <!-- 토스트 알림 -->
+    <div id="toast" class="toast hidden"></div>
+
+  </div>
+
+  <script src="/static/js/main.js"></script>
+</body>
+</html>
